@@ -1,0 +1,3 @@
+```shell
+cargo add clap
+```
