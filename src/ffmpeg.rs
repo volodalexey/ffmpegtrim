@@ -51,11 +51,59 @@ pub fn trim_start_end(
     take_video: bool,
     take_audio: bool,
 ) {
+    if trim_start.contains("dur") && trim_end.contains("dur") {
+        panic!("Both trim-start and trim-end options use duration value, only one allowed");
+    }
     let duration = calc_duration(input_filepath);
 
     let mut new_duration: f32 = 0.0;
-    let seconds_from_start: f32 = trim_start.parse().unwrap_or(0.0);
-    let seconds_from_end: f32 = trim_end.parse().unwrap_or(0.0);
+    let mut seconds_from_start: f32 = trim_start.parse().unwrap_or(0.0);
+    let mut from_start_duration: f32 = 0.0;
+    if trim_start.contains("dur") {
+        let mut parts: Split<&str> = trim_start.split("dur");
+
+        seconds_from_start = parts
+            .next()
+            .expect("Can not detect seconds from start")
+            .trim()
+            .parse()
+            .unwrap_or(0.0);
+
+        from_start_duration = parts
+            .next()
+            .expect("Can not detect duration from start")
+            .trim()
+            .parse()
+            .unwrap_or(0.0);
+    }
+
+    let mut seconds_from_end: f32 = trim_end.parse().unwrap_or(0.0);
+    let mut from_end_duration: f32 = 0.0;
+    if trim_end.contains("dur") {
+        let mut parts: Split<&str> = trim_end.split("dur");
+
+        seconds_from_end = parts
+            .next()
+            .expect("Can not detect seconds from end")
+            .trim()
+            .parse()
+            .unwrap_or(0.0);
+
+        from_end_duration = parts
+            .next()
+            .expect("Can not detect duration from end")
+            .trim()
+            .parse()
+            .unwrap_or(0.0);
+    }
+
+    if seconds_from_end > 0.0 && from_start_duration > 0.0 {
+        panic!("Trim-start contains duration that conflicts with trim-end");
+    }
+    if seconds_from_start > 0.0 && from_end_duration > 0.0 {
+        panic!("Trim-end contains duration that conflicts with trim-start");
+    }
+
     if seconds_from_end > 0.0 {
         new_duration = duration - seconds_from_end;
         if new_duration <= 0.0 {
@@ -78,7 +126,14 @@ pub fn trim_start_end(
         .to_str()
         .unwrap();
 
+    println!("seconds_from_start={seconds_from_start} from_start_duration={from_start_duration} seconds_from_end={seconds_from_end} from_end_duration={from_end_duration} new_duration={new_duration}");
     let mut command = Command::new("ffmpeg");
+    if from_start_duration > 0.0 {
+        new_duration = seconds_from_start + from_start_duration;
+    }
+    if from_end_duration > 0.0 {
+        seconds_from_start = new_duration - from_end_duration;
+    }
     if seconds_from_start > 0.0 {
         command.args(["-ss", &seconds_from_start.to_string()]);
     }
