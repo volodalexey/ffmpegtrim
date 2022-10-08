@@ -52,6 +52,14 @@ struct Args {
         default_value = "mp4"
     )]
     ext: String,
+
+    #[clap(
+        short = 'i',
+        long = "includes",
+        help = "process file that includes <i> in file path",
+        default_value = ""
+    )]
+    includes: String,
 }
 
 fn main() {
@@ -77,6 +85,11 @@ fn main() {
                 .to_str()
                 .expect("Unable to get file extension")
                 .ends_with(&args.ext)
+            && (args.includes.is_empty()
+                || path
+                    .to_str()
+                    .expect("Unable to get file extension")
+                    .contains(&args.includes))
         {
             trim_start_end(
                 path.to_str().unwrap(),
