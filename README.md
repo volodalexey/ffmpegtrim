@@ -1,7 +1,7 @@
 # ffmpegtrim
-Rust cli tool to trim off last seconds from file
+CLI tool to trim off some seconds from start and/or from end of file
 
-Process all files in the directory.
+Process all files in the directory unless .
 Trim specified seconds from start.
 Trim specified seconds from end.
 
@@ -20,10 +20,11 @@ OPTIONS:
     -a, --take-audio                 take audio from input source and map to the output (skip
                                      anything else, e.g. subtitles)
     -c, --copy                       copy without encoding
-    -d, --dir <DIR>                  input directory path [default: /mnt/mystorage/Video]
-    -e, --trim-end <TRIM_END>        trim seconds from end of file [default: ]
+    -d, --dir <DIR>                  input directory path [default: current directory]
+    -e, --trim-end <TRIM_END>        trim seconds from end of file [default: 0.0]
     -h, --help                       Print help information
-    -s, --trim-start <TRIM_START>    trim seconds from start of file [default: ]
+    -i, --includes <INCLUDES>        process file that includes <i> in file path
+    -s, --trim-start <TRIM_START>    trim seconds from start of file [default: 0.0]
     -v, --take-video                 take video from input source and map to the output (skip
                                      anything else, e.g. subtitles)
     -V, --version                    Print version information

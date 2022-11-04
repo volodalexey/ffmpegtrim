@@ -2,9 +2,10 @@ use std::path::Path;
 use std::{env, fs};
 
 use clap::Parser;
-use ffmpeg::trim_start_end;
+use ffmpeg::{calc_duration, trim_start_end};
 
 mod ffmpeg;
+mod helpers;
 
 #[derive(Parser, Debug)]
 #[clap(author, version, about, long_about = None)]
@@ -80,19 +81,15 @@ fn main() {
 
     for path in paths {
         let path = path.unwrap().path();
+        let path_str = path.to_str().expect("Unable to cast path to string");
         if path.is_file()
-            && path
-                .to_str()
-                .expect("Unable to get file extension")
-                .ends_with(&args.ext)
-            && (args.includes.is_empty()
-                || path
-                    .to_str()
-                    .expect("Unable to get file extension")
-                    .contains(&args.includes))
+            && path_str.ends_with(&args.ext)
+            && (args.includes.is_empty() || path_str.contains(&args.includes))
         {
+            let input_filepath = path.to_str().unwrap();
             trim_start_end(
-                path.to_str().unwrap(),
+                input_filepath,
+                calc_duration(input_filepath),
                 &args.trim_start,
                 &args.trim_end,
                 args.copy,
