@@ -8,6 +8,7 @@ Trim specified seconds from end.
 [ffmpeg](https://ffmpeg.org/) must be installed!
 
 See [stackoverflow](https://stackoverflow.com/a/55337279/5431545) for more details
+See [sseof](https://stackoverflow.com/a/36120894/5431545) input option for simple usage
 
 Tested on Linux.
 

@@ -1,6 +1,6 @@
 use pbr::ProgressBar;
 use std::{
-    io::{stdout, BufRead, BufReader, Read, Stdout, Write},
+    io::{stdin, stdout, BufRead, BufReader, Read, Stdout, Write},
     path::Path,
     process::{Command, Stdio},
     str::Split,
@@ -35,7 +35,7 @@ pub fn calc_duration(filepath: &str) -> f32 {
 
     if status.success() {
         result.pop(); // remove en of line for parsing
-        let duration: f32 = result.parse().unwrap();
+        let duration: f32 = result.parse().expect("Unable to parse duration as f32");
         if duration > 0.0 {
             return duration;
         }
@@ -132,7 +132,7 @@ pub fn calc_command_result(
         // command.args(["-flags", "+ildct+ilme"]); // keep interlace frame
         command.args(["-vf", "yadif"]); // remove interlacing
     }
-    command.arg(output_filepath.clone());
+    command.arg(output_filepath.to_owned());
     let command_str = command
         .get_args()
         .map(|arg| arg.to_str().unwrap())
@@ -251,6 +251,7 @@ pub fn trim_start_end(
     take_video: bool,
     take_audio: bool,
 ) {
+    let mut soft_exit = false;
     let mut command_result = calc_command_result(
         input_filepath,
         duration,
@@ -262,64 +263,104 @@ pub fn trim_start_end(
     );
 
     println!(
-        "Started trim for => {}\nffmpeg {:?}\noutput => {}",
-        command_result.input_filename, command_result.command_str, command_result.output_filename,
+        "Input => {}\nDuration => {}\nffmpeg {}\nOutput => {}",
+        command_result.input_filename,
+        duration,
+        command_result.command_str,
+        command_result.output_filename,
     );
     let mut child = command_result
         .command
-        .stdout(Stdio::piped())
+        .stdin(Stdio::piped())
         .stderr(Stdio::piped())
         .spawn()
-        .unwrap();
+        .expect("Unable to start child program");
 
     let progress_duration = command_result.duration.round() as i32;
     let mut pb: ProgressBar<Stdout> = ProgressBar::new(progress_duration as u64);
     pb.show_counter = false;
     let mut progress_started = false;
+    let mut self_stdout = stdout();
 
-    let child_stderr = child.stderr.as_mut().expect("Unable to pipe stderr");
-    let mut reader = BufReader::new(child_stderr);
-    let mut buff = String::new();
-    let mut out_time_found = false;
-    while reader.read_line(&mut buff).expect("Unable to read line") > 0 {
-        for line in buff.lines() {
-            if line.contains("out_time_ms") {
-                let parts: Split<&str> = line.split("=");
+    let child_stderr = child.stderr.take().expect("No child stderr");
+    let mut reader_stderr = BufReader::new(child_stderr);
+    let mut buff_stderr = [0; 50];
+    let mut buff_str = String::new();
+    let mut len = reader_stderr
+        .read(&mut buff_stderr)
+        .expect("Unable to read from child stderr");
 
-                let out_time_ms: i32 = parts
-                    .last()
-                    .expect("Can not detect out_time_ms value")
-                    .trim()
-                    .parse()
-                    .unwrap_or(-1);
-
-                if out_time_ms >= 0 {
-                    let current_time_ms = out_time_ms / 1000000;
-                    pb.set(current_time_ms as u64);
-                    if !progress_started {
-                        progress_started = true;
-                    }
+    while len > 0 {
+        for i in 0..len {
+            let char_code = buff_stderr[i];
+            buff_str.push(char_code as char);
+            if char_code == 32 {
+                // space
+                if buff_str.contains("Overwrite? [y/N]") {
+                    self_stdout
+                        .write(buff_str.as_bytes())
+                        .expect("Unable to write to stdout");
+                    self_stdout.flush().expect("Can not flush stdout"); // force stdout to print without end of line
+                    buff_str.clear();
+                    let mut answer = String::new();
+                    let self_stdin = stdin();
+                    self_stdin
+                        .lock()
+                        .read_line(&mut answer)
+                        .expect("Unable to read stdin into line");
+                    let child_stdin = child.stdin.as_mut().expect("No child stdin");
+                    child_stdin
+                        .write(answer.as_bytes())
+                        .expect("Unable to write to child stdin");
+                    drop(child_stdin);
                 }
-                out_time_found = true;
+            } else if char_code == 10 {
+                // line end
+                // self_stdout
+                //     .write(buff_str.as_bytes())
+                //     .expect("Unable to write to stdout");
+                if buff_str.contains("Not overwriting - exiting") {
+                    soft_exit = true;
+                } else if buff_str.contains("out_time_ms") {
+                    let parts: Split<&str> = buff_str.split("=");
+
+                    let out_time_ms: i32 = parts
+                        .last()
+                        .expect("Can not detect out_time_ms value")
+                        .trim()
+                        .parse()
+                        .unwrap_or(-1);
+
+                    if out_time_ms >= 0 {
+                        let current_time_ms = out_time_ms / 1000000;
+                        pb.set(current_time_ms as u64);
+                        if !progress_started {
+                            progress_started = true;
+                        }
+                    }
+                    buff_str.clear();
+                } else {
+                    // drop unneccessary information
+                    buff_str.clear();
+                }
             }
         }
-        if out_time_found {
-            buff.clear();
-            out_time_found = false;
-        }
+        len = reader_stderr
+            .read(&mut buff_stderr)
+            .expect("Unable to read from child stderr");
     }
     if progress_started {
         pb.finish();
     }
+    let mut self_stdout = stdout();
+    self_stdout
+        .write(buff_str.as_bytes())
+        .expect("Unable to write to stdout");
 
     let status = child.wait().unwrap();
-    if status.success() {
+    if status.success() || soft_exit {
         return;
-    } else {
-        let mut self_stdout = stdout();
-        self_stdout
-            .write(buff.as_bytes())
-            .expect("Unable to write to stdout");
     }
+
     panic!("Unable to complete decode!");
 }

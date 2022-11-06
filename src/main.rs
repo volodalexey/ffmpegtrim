@@ -77,19 +77,25 @@ fn main() {
         panic!("Either trim-start or trim-end option must be provided!");
     }
 
-    let paths = fs::read_dir(args.dir).unwrap();
+    let entries = fs::read_dir(args.dir).expect("Unable to read input ");
 
-    for path in paths {
-        let path = path.unwrap().path();
-        let path_str = path.to_str().expect("Unable to cast path to string");
+    let mut file_pathes: Vec<String> = Vec::new();
+    for entry in entries {
+        let path = entry.expect("Unable to cast DirEntry to PathBuf").path();
+        let path_str = path.to_str().expect("Unable to cast PathBuf to &str");
         if path.is_file()
             && path_str.ends_with(&args.ext)
             && (args.includes.is_empty() || path_str.contains(&args.includes))
         {
-            let input_filepath = path.to_str().unwrap();
+            file_pathes.push(path_str.to_owned());
+        }
+    }
+
+    if file_pathes.len() > 0 {
+        for file_path in file_pathes {
             trim_start_end(
-                input_filepath,
-                calc_duration(input_filepath),
+                &file_path,
+                calc_duration(&file_path),
                 &args.trim_start,
                 &args.trim_end,
                 args.copy,
@@ -97,7 +103,8 @@ fn main() {
                 args.take_audio,
             )
         }
+        println!("DONE");
+    } else {
+        println!("EMPTY");
     }
-
-    println!("DONE");
 }
