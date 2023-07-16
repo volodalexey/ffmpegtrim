@@ -61,6 +61,10 @@ Trim 33 seconds from start & keep only 5 seconds after start position & filter f
 ```shell
 ./ffmpegtrim -s 33dur5 -i 01 -x mkv
 ```
+Print all files in current folder and filtered files that will be processed
+```shell
+./ffmpegtrim -l
+```
 
 ## Build
 ```shell

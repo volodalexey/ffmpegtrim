@@ -90,7 +90,7 @@ fn main() {
         let path_str = path.to_str().expect("Unable to cast PathBuf to &str");
         if path.is_file() {
             if args.list {
-                println!("{:?}", path);
+                println!("raw {:?}", path);
             }
             if path_str.ends_with(&args.ext)
                 && (args.includes.is_empty() || path_str.contains(&args.includes))
@@ -101,6 +101,9 @@ fn main() {
     }
 
     if file_pathes.len() > 0 {
+        if args.list {
+            println!("filtered {:?}", file_pathes);
+        }
         if args.trim_start.is_empty() && args.trim_end.is_empty() {
             panic!("Either trim-start or trim-end option must be provided!");
         }
