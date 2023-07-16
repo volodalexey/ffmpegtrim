@@ -61,6 +61,13 @@ struct Args {
         default_value = ""
     )]
     includes: String,
+
+    #[clap(
+        short = 'l',
+        long = "list",
+        help = "list all file paths in current directory"
+    )]
+    list: bool,
 }
 
 fn main() {
@@ -73,25 +80,30 @@ fn main() {
         );
     }
 
-    if args.trim_start.is_empty() && args.trim_end.is_empty() {
-        panic!("Either trim-start or trim-end option must be provided!");
-    }
-
     let entries = fs::read_dir(args.dir).expect("Unable to read input ");
+
+    println!("Ends with \"{}\"", args.ext);
 
     let mut file_pathes: Vec<String> = Vec::new();
     for entry in entries {
         let path = entry.expect("Unable to cast DirEntry to PathBuf").path();
         let path_str = path.to_str().expect("Unable to cast PathBuf to &str");
-        if path.is_file()
-            && path_str.ends_with(&args.ext)
-            && (args.includes.is_empty() || path_str.contains(&args.includes))
-        {
-            file_pathes.push(path_str.to_owned());
+        if path.is_file() {
+            if args.list {
+                println!("{:?}", path);
+            }
+            if path_str.ends_with(&args.ext)
+                && (args.includes.is_empty() || path_str.contains(&args.includes))
+            {
+                file_pathes.push(path_str.to_owned());
+            }
         }
     }
 
     if file_pathes.len() > 0 {
+        if args.trim_start.is_empty() && args.trim_end.is_empty() {
+            panic!("Either trim-start or trim-end option must be provided!");
+        }
         for file_path in file_pathes {
             trim_start_end(
                 &file_path,

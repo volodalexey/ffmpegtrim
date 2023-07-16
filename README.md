@@ -57,6 +57,10 @@ Trim 32 seconds from end & keep only 5 seconds before end position & take first 
 ```shell
 ./ffmpegtrim -e 32dur5 -a -v
 ```
+Trim 33 seconds from start & keep only 5 seconds after start position & filter files with mkv extension and path contains 01
+```shell
+./ffmpegtrim -s 33dur5 -i 01 -x mkv
+```
 
 ## Build
 ```shell
