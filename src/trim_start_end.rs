@@ -8,42 +8,6 @@ use std::{
 
 use crate::helpers::parse_float;
 
-pub fn calc_duration(filepath: &str) -> f32 {
-    let mut child = Command::new("ffprobe")
-        .args([
-            "-v",
-            "error",
-            "-show_entries",
-            "format=duration",
-            "-of",
-            "csv=p=0",
-        ])
-        .arg(filepath)
-        .stdout(Stdio::piped())
-        .spawn()
-        .unwrap();
-
-    let status = child.wait().unwrap();
-
-    let stdout = child.stdout.unwrap();
-
-    let mut reader = BufReader::new(stdout);
-
-    let mut result = String::new();
-
-    reader.read_to_string(&mut result).unwrap();
-
-    if status.success() {
-        result.pop(); // remove en of line for parsing
-        let duration: f32 = result.parse().expect("Unable to parse duration as f32");
-        if duration > 0.0 {
-            return duration;
-        }
-        panic!("Parsed duration {duration} less then 0 (at {result})");
-    }
-    panic!("Unable to calc {filepath} duration! Result is {result}");
-}
-
 pub struct CommandResult {
     pub command: Command,
     pub command_str: String,
@@ -53,7 +17,7 @@ pub struct CommandResult {
     pub seconds_from_start: f32,
 }
 
-pub fn calc_command_result(
+pub fn trim_start_end_command(
     input_filepath: &str,
     duration: f32,
     trim_start: &str,
@@ -159,11 +123,11 @@ pub fn calc_command_result(
 
 #[cfg(test)]
 mod tests {
-    use super::calc_command_result;
+    use super::trim_start_end_command;
 
     #[test]
     fn calc_command_result_basic() {
-        let command_result = calc_command_result("/f.f", 10.0, "", "", false, false, false);
+        let command_result = trim_start_end_command("/f.f", 10.0, "", "", false, false, false);
 
         assert_eq!(command_result.input_filename, "f.f");
         assert_eq!(command_result.output_filename, "f_tr.f");
@@ -177,7 +141,7 @@ mod tests {
 
     #[test]
     fn calc_command_result_trim_start() {
-        let command_result = calc_command_result("/a.mp4", 10.0, "4.5", "", true, false, false);
+        let command_result = trim_start_end_command("/a.mp4", 10.0, "4.5", "", true, false, false);
 
         assert_eq!(command_result.input_filename, "a.mp4");
         assert_eq!(command_result.output_filename, "a_tr.mp4");
@@ -191,7 +155,7 @@ mod tests {
 
     #[test]
     fn calc_command_result_trim_end() {
-        let command_result = calc_command_result("/b.mp4", 10.0, "", "5.46", false, true, true);
+        let command_result = trim_start_end_command("/b.mp4", 10.0, "", "5.46", false, true, true);
 
         assert_eq!(command_result.input_filename, "b.mp4");
         assert_eq!(command_result.output_filename, "b_tr.mp4");
@@ -206,7 +170,7 @@ mod tests {
     #[test]
     fn calc_command_result_trim_both() {
         let command_result =
-            calc_command_result("/some/c.mp4", 10.0, "1.52", "3.33", true, false, true);
+            trim_start_end_command("/some/c.mp4", 10.0, "1.52", "3.33", true, false, true);
 
         assert_eq!(command_result.input_filename, "c.mp4");
         assert_eq!(command_result.output_filename, "c_tr.mp4");
@@ -223,13 +187,13 @@ mod tests {
         expected = "Both trim-start and trim-end options use duration value, only one allowed"
     )]
     fn calc_command_result_panic_both_dur() {
-        calc_command_result("/some/c.mp4", 0.0, "1dur1", "1dur1", false, false, false);
+        trim_start_end_command("/some/c.mp4", 0.0, "1dur1", "1dur1", false, false, false);
     }
 
     #[test]
     fn calc_command_result_trim_start_dur() {
         let command_result =
-            calc_command_result("/s/d.mp4", 10.0, "1.52dur4.5", "", false, false, true);
+            trim_start_end_command("/s/d.mp4", 10.0, "1.52dur4.5", "", false, false, true);
 
         assert_eq!(command_result.input_filename, "d.mp4");
         assert_eq!(command_result.output_filename, "d_tr.mp4");
@@ -252,7 +216,7 @@ pub fn trim_start_end(
     take_audio: bool,
 ) {
     let mut soft_exit = false;
-    let mut command_result = calc_command_result(
+    let mut command_result = trim_start_end_command(
         input_filepath,
         duration,
         trim_start,
