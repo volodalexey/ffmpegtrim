@@ -14,34 +14,30 @@ struct Args {
     dir: String,
 
     #[clap(
-        short = 's',
-        long = "trim-start",
+        long = "ts",
         help = "trim seconds from start of file",
         default_value = ""
     )]
     trim_start: String,
 
     #[clap(
-        short = 'e',
-        long = "trim-end",
+        long = "te",
         help = "trim seconds from end of file",
         default_value = ""
     )]
     trim_end: String,
 
-    #[clap(short = 'c', long = "copy", help = "copy without encoding")]
-    copy: bool,
+    #[clap(long = "se", help = "skip encoding")]
+    skip_encoding: bool,
 
     #[clap(
-        short = 'v',
-        long = "take-video",
+        long = "tv",
         help = "take video from input source and map to the output (skip anything else, e.g. subtitles)"
     )]
     take_video: bool,
 
     #[clap(
-        short = 'a',
-        long = "take-audio",
+        long = "ta",
         help = "take audio from input source and map to the output (skip anything else, e.g. subtitles)"
     )]
     take_audio: bool,
@@ -49,18 +45,18 @@ struct Args {
     #[clap(
         short = 'x',
         long = "ext",
-        help = "file extension",
+        help = "file(s) extension",
         default_value = "mp4"
     )]
     ext: String,
 
     #[clap(
-        short = 'i',
-        long = "includes",
-        help = "process file that includes <i> in file path",
+        short = 'f',
+        long = "filter",
+        help = "process file that includes <f> in file path",
         default_value = ""
     )]
-    includes: String,
+    filter: String,
 
     #[clap(
         short = 'l',
@@ -93,7 +89,7 @@ fn main() {
                 println!("raw {:?}", path);
             }
             if path_str.ends_with(&args.ext)
-                && (args.includes.is_empty() || path_str.contains(&args.includes))
+                && (args.filter.is_empty() || path_str.contains(&args.filter))
             {
                 file_pathes.push(path_str.to_owned());
             }
@@ -113,7 +109,7 @@ fn main() {
                 calc_duration(&file_path),
                 &args.trim_start,
                 &args.trim_end,
-                args.copy,
+                args.skip_encoding,
                 args.take_video,
                 args.take_audio,
             )

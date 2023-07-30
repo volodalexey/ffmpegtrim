@@ -12,9 +12,9 @@ pub struct PartsFloat<'a> {
 pub fn parse_float<'a>(str: &'a str, splitter: &'a str) -> PartsFloat<'a> {
     let mut parts: Split<&str> = str.split(splitter);
 
-    let before_str = parts.next().expect("Can not detect before string").trim();
+    let before_str = parts.next().expect("Can not detect before splitter").trim();
     let before_float: f32 = before_str.parse().unwrap_or(0.0);
-    let after_str = parts.next().expect("Can not detect after string").trim();
+    let after_str = parts.next().expect("Can not detect after splitter").trim();
     let after_float: f32 = after_str.parse().unwrap_or(0.0);
 
     return PartsFloat {
@@ -39,7 +39,7 @@ mod tests {
     }
 
     #[test]
-    #[should_panic(expected = "Can not detect after string")]
+    #[should_panic(expected = "Can not detect after splitter")]
     fn parse_float_panic_after() {
         parse_float("", "=");
     }

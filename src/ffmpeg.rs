@@ -58,7 +58,7 @@ pub fn calc_command_result(
     duration: f32,
     trim_start: &str,
     trim_end: &str,
-    copy: bool,
+    skip_encoding: bool,
     take_video: bool,
     take_audio: bool,
 ) -> CommandResult {
@@ -126,7 +126,7 @@ pub fn calc_command_result(
     if take_audio {
         command.args(["-map", "0:a:0"]);
     }
-    if copy {
+    if skip_encoding {
         command.args(["-c", "copy"]);
     } else {
         // command.args(["-flags", "+ildct+ilme"]); // keep interlace frame
@@ -247,7 +247,7 @@ pub fn trim_start_end(
     duration: f32,
     trim_start: &str,
     trim_end: &str,
-    copy: bool,
+    skip_encoding: bool,
     take_video: bool,
     take_audio: bool,
 ) {
@@ -257,7 +257,7 @@ pub fn trim_start_end(
         duration,
         trim_start,
         trim_end,
-        copy,
+        skip_encoding,
         take_video,
         take_audio,
     );
