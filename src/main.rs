@@ -132,6 +132,13 @@ fn main() {
         println!("filtered {:?}", file_pathes);
     }
 
+    let intro_gt_duration = "15";
+    let intro_lt_duration = "30";
+    let intro_add: f32 = 0.0;
+    let outro_gt_duration = "280";
+    let outro_lt_duration = "300";
+    let outro_add: f32 = 1.0;
+
     for (file_name, file_path) in file_pathes {
         if !args.make_screenshot.is_empty() {
             let mut path_buf = PathBuf::from(&file_path);
@@ -160,11 +167,14 @@ fn main() {
                     duration,
                     "85",
                     "05",
-                    "15",
-                    "40",
+                    intro_gt_duration,
+                    intro_lt_duration,
                     false,
+                ) + intro_add;
+                println!(
+                    "Detected last intro frame {} (add {})",
+                    last_intro_frame_time, intro_add
                 );
-                println!("Detected last intro frame {}", last_intro_frame_time);
             }
         }
         let last_intro_frame_time_str = last_intro_frame_time.to_string();
@@ -186,11 +196,14 @@ fn main() {
                     duration,
                     "85",
                     "05",
-                    "280",
-                    "400",
+                    outro_gt_duration,
+                    outro_lt_duration,
                     true,
+                ) + outro_add;
+                println!(
+                    "Detected first outro frame {} (add {})",
+                    first_outro_frame_time, outro_add
                 );
-                println!("Detected first outro frame {}", first_outro_frame_time);
             }
         }
         let outro_frame_from_end_str = (duration - first_outro_frame_time).to_string();
