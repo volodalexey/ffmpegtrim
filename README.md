@@ -14,22 +14,25 @@ Tested on Linux.
 
 ## Options
 ```shell
-USAGE:
-    ffmpegtrim [OPTIONS]
+Usage: ffmpegtrim [OPTIONS]
 
-OPTIONS:
-    -a, --take-audio                 take audio from input source and map to the output (skip
-                                     anything else, e.g. subtitles)
-    -c, --copy                       copy without encoding
-    -d, --dir <DIR>                  input directory path [default: current directory]
-    -e, --trim-end <TRIM_END>        trim seconds from end of file [default: 0.0]
-    -h, --help                       Print help information
-    -i, --includes <INCLUDES>        process file that includes <i> in file path
-    -s, --trim-start <TRIM_START>    trim seconds from start of file [default: 0.0]
-    -v, --take-video                 take video from input source and map to the output (skip
-                                     anything else, e.g. subtitles)
-    -V, --version                    Print version information
-    -x, --ext <EXT>                  file extension [default: mp4]
+Options:
+  -d, --dir <DIR>              input directory path [default: /mnt/mystorage/rs_projects/ffmpegtrim]
+      --ts <TRIM_START>        trim seconds from start of file [default: ]
+      --if <INTRO_FRAME>       intro frame file path [default: ]
+      --te <TRIM_END>          trim seconds from end of file [default: ]
+      --of <OUTRO_FRAME>       outro frame file path [default: ]
+      --se                     skip encoding
+      --tv                     take video from input source and map to the output (skip anything else, e.g. subtitles)
+      --ta                     take audio from input source and map to the output (skip anything else, e.g. subtitles)
+  -x, --ext <EXT>              file(s) extension [default: mp4]
+  -f, --filter <FILTER>        process file that includes <f> in file path [default: ]
+  -l, --list                   list all file paths in current directory
+      --testi                  run test mode for images output only
+      --testv                  run test mode for videos output only
+      --scr <MAKE_SCREENSHOT>  make screenshot at time [default: ]
+  -h, --help                   Print help
+  -V, --version                Print version
 ```
 
 ## Examples
@@ -39,27 +42,27 @@ Show help
 ```
 Trim 60 seconds from start and 20 seconds from end
 ```shell
-./ffmpegtrim -s 60 -e 20
+./ffmpegtrim --ts 60 --te 20
 ```
 Trim 45 seconds from start & filter files with mkv extension
 ```shell
-./ffmpegtrim -s 45 -x mkv
+./ffmpegtrim --ts 45 -x mkv
 ```
 Trim 45 seconds from start & filter files with mp4 extension & do not re-encode, try to quick split if possible
 ```shell
-./ffmpegtrim -s 45 -x mp4 -c
+./ffmpegtrim --ts 45 -x mp4 --se
 ```
 Trim 48 seconds from start & keep only 5 seconds after start position & filter files with mkv extension
 ```shell
-./ffmpegtrim -s 48dur5 -x mkv
+./ffmpegtrim --ts 48dur5 -x mkv
 ```
 Trim 32 seconds from end & keep only 5 seconds before end position & take first video stream & take first audio stream
 ```shell
-./ffmpegtrim -e 32dur5 -a -v
+./ffmpegtrim --te 32dur5 --ta --tv
 ```
 Trim 33 seconds from start & keep only 5 seconds after start position & filter files with mkv extension and path contains 01
 ```shell
-./ffmpegtrim -s 33dur5 -i 01 -x mkv
+./ffmpegtrim --ts 33dur5 -f 01 -x mkv
 ```
 Print all files in current folder and filtered files that will be processed
 ```shell
