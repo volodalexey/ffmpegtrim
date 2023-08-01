@@ -17,22 +17,26 @@ Tested on Linux.
 Usage: ffmpegtrim [OPTIONS]
 
 Options:
-  -d, --dir <DIR>              input directory path [default: /mnt/mystorage/rs_projects/ffmpegtrim]
-      --ts <TRIM_START>        trim seconds from start of file [default: ]
-      --if <INTRO_FRAME>       intro frame file path [default: ]
-      --te <TRIM_END>          trim seconds from end of file [default: ]
-      --of <OUTRO_FRAME>       outro frame file path [default: ]
-      --se                     skip encoding
-      --tv                     take video from input source and map to the output (skip anything else, e.g. subtitles)
-      --ta                     take audio from input source and map to the output (skip anything else, e.g. subtitles)
-  -x, --ext <EXT>              file(s) extension [default: mp4]
-  -f, --filter <FILTER>        process file that includes <f> in file path [default: ]
-  -l, --list                   list all file paths in current directory
-      --testi                  run test mode for images output only
-      --testv                  run test mode for videos output only
-      --scr <MAKE_SCREENSHOT>  make screenshot at time [default: ]
-  -h, --help                   Print help
-  -V, --version                Print version
+  -d, --dir <DIR>                 input directory path [default: /mnt/mystorage/rs_projects/ffmpegtrim]
+      --ts <TRIM_START>           trim seconds from start of file [default: ]
+      --if <INTRO_FRAME>          intro frame file path [default: ]
+      --ifgt <INTRO_GT_DURATION>  intro frame greater than duration [default: ]
+      --iflt <INTRO_LT_DURATION>  intro frame less than duration [default: ]
+      --te <TRIM_END>             trim seconds from end of file [default: ]
+      --of <OUTRO_FRAME>          outro frame file path [default: ]
+      --ofgt <OUTRO_GT_DURATION>  outro frame greater than duration [default: ]
+      --oflt <OUTRO_LT_DURATION>  outro frame less than duration [default: ]
+      --se                        skip encoding
+      --tv                        take video from input source and map to the output (skip anything else, e.g. subtitles)
+      --ta                        take audio from input source and map to the output (skip anything else, e.g. subtitles)
+  -x, --ext <EXT>                 file(s) extension [default: mp4]
+  -f, --filter <FILTER>           process file that includes <f> in file path [default: ]
+  -l, --list                      list all file paths in current directory
+      --testi                     run test mode for images output only
+      --testv                     run test mode for videos output only
+      --scr <MAKE_SCREENSHOT>     make screenshot at time [default: ]
+  -h, --help                      Print help
+  -V, --version                   Print version
 ```
 
 ## Examples
@@ -72,4 +76,11 @@ Print all files in current folder and filtered files that will be processed
 ## Build
 ```shell
 cargo build --release
+```
+Test build directly
+```
+cargo run -- -d /mnt/mystorage/Video/t --filter 51 --ts 21.32 --te 17.7
+cargo run -- -d /mnt/mystorage/Video/t --filter 51 --if /mnt/mystorage/Video/t/intro.jpg --ifgt 15 --iflt 30 --of /mnt/mystorage/Video/t/outro.jpg --ofgt 280 --oflt 300
+cargo run -- -d /mnt/mystorage/Video/t --ifgt 50 --iflt 60 --ofgt 550 --oflt 600
+cargo run -- -d /mnt/mystorage/Video/t --if /mnt/mystorage/Video/t/intro.jpg --ifgt 50 --iflt 60 --of /mnt/mystorage/Video/t/outro.jpg --ofgt 550 --oflt 600
 ```

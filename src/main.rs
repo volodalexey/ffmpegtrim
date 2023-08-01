@@ -35,6 +35,20 @@ struct Args {
     intro_frame: String,
 
     #[clap(
+        long = "ifgt",
+        help = "intro frame greater than duration",
+        default_value = ""
+    )]
+    intro_gt_duration: String,
+
+    #[clap(
+        long = "iflt",
+        help = "intro frame less than duration",
+        default_value = ""
+    )]
+    intro_lt_duration: String,
+
+    #[clap(
         long = "te",
         help = "trim seconds from end of file",
         default_value = ""
@@ -43,6 +57,20 @@ struct Args {
 
     #[clap(long = "of", help = "outro frame file path", default_value = "")]
     outro_frame: String,
+
+    #[clap(
+        long = "ofgt",
+        help = "outro frame greater than duration",
+        default_value = ""
+    )]
+    outro_gt_duration: String,
+
+    #[clap(
+        long = "oflt",
+        help = "outro frame less than duration",
+        default_value = ""
+    )]
+    outro_lt_duration: String,
 
     #[clap(long = "se", help = "skip encoding")]
     skip_encoding: bool,
@@ -132,11 +160,7 @@ fn main() {
         println!("filtered {:?}", file_pathes);
     }
 
-    let intro_gt_duration = "15";
-    let intro_lt_duration = "30";
     let intro_add: f32 = 0.0;
-    let outro_gt_duration = "280";
-    let outro_lt_duration = "300";
     let outro_add: f32 = 1.0;
 
     for (file_name, file_path) in file_pathes {
@@ -167,8 +191,8 @@ fn main() {
                     duration,
                     "85",
                     "05",
-                    intro_gt_duration,
-                    intro_lt_duration,
+                    &args.intro_gt_duration,
+                    &args.intro_lt_duration,
                     false,
                 ) + intro_add;
                 println!(
@@ -196,8 +220,8 @@ fn main() {
                     duration,
                     "85",
                     "05",
-                    outro_gt_duration,
-                    outro_lt_duration,
+                    &args.outro_gt_duration,
+                    &args.outro_lt_duration,
                     true,
                 ) + outro_add;
                 println!(

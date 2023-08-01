@@ -48,11 +48,11 @@ pub fn detect_frame(
     blackframe_amount: &str,
     blackframe_threshold: &str,
     greater_than_duration: &str,
-    lower_than_duration: &str,
+    less_than_duration: &str,
     first_or_last: bool,
 ) -> f32 {
     let greater_than_duration: f32 = greater_than_duration.parse().unwrap_or(-1.0);
-    let lower_than_duration: f32 = lower_than_duration.parse().unwrap_or(-1.0);
+    let lower_than_duration: f32 = less_than_duration.parse().unwrap_or(-1.0);
     println!(
         "Frame analyse started... (Duration {}) gtd ({}) ltd ({})=>",
         duration, greater_than_duration, lower_than_duration
@@ -126,7 +126,7 @@ pub fn detect_frame(
                     if let Some(frame_str) = frame_parts.last() {
                         if let Some(frame_value) = frame_str.split_whitespace().next() {
                             if let Ok(frame) = frame_value.parse::<u32>() {
-                                println!("Progress frame {}", frame);
+                                print!(" Progress frame {} ", frame);
                             }
                         }
                     }
