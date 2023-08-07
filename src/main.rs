@@ -49,6 +49,20 @@ struct Args {
     intro_lt_duration: String,
 
     #[clap(
+        long = "ifba",
+        help = "intro frame blackframe amount",
+        default_value = "95"
+    )]
+    intro_blackframe_amount: String,
+
+    #[clap(
+        long = "ifbt",
+        help = "intro frame blackframe threshold",
+        default_value = "15"
+    )]
+    intro_blackframe_threshold: String,
+
+    #[clap(
         long = "te",
         help = "trim seconds from end of file",
         default_value = ""
@@ -71,6 +85,20 @@ struct Args {
         default_value = ""
     )]
     outro_lt_duration: String,
+
+    #[clap(
+        long = "ofba",
+        help = "outro frame blackframe amount",
+        default_value = "95"
+    )]
+    outro_blackframe_amount: String,
+
+    #[clap(
+        long = "ofbt",
+        help = "outro frame blackframe threshold",
+        default_value = "15"
+    )]
+    outro_blackframe_threshold: String,
 
     #[clap(long = "se", help = "skip encoding")]
     skip_encoding: bool,
@@ -189,14 +217,14 @@ fn main() {
                     &file_path,
                     frame_filepath,
                     duration,
-                    "85",
-                    "05",
+                    &args.intro_blackframe_amount,
+                    &args.intro_blackframe_threshold,
                     &args.intro_gt_duration,
                     &args.intro_lt_duration,
                     false,
                 ) + intro_add;
                 println!(
-                    "Detected last intro frame {} (add {})",
+                    "\nDetected last intro frame {} (add {})",
                     last_intro_frame_time, intro_add
                 );
             }
@@ -218,14 +246,14 @@ fn main() {
                     &file_path,
                     frame_filepath,
                     duration,
-                    "85",
-                    "05",
+                    &args.outro_blackframe_amount,
+                    &args.outro_blackframe_threshold,
                     &args.outro_gt_duration,
                     &args.outro_lt_duration,
                     true,
                 ) + outro_add;
                 println!(
-                    "Detected first outro frame {} (add {})",
+                    "\nDetected first outro frame {} (add {})",
                     first_outro_frame_time, outro_add
                 );
             }

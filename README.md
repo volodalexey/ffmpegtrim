@@ -17,26 +17,54 @@ Tested on Linux.
 Usage: ffmpegtrim [OPTIONS]
 
 Options:
-  -d, --dir <DIR>                 input directory path [default: /mnt/mystorage/rs_projects/ffmpegtrim]
-      --ts <TRIM_START>           trim seconds from start of file [default: ]
-      --if <INTRO_FRAME>          intro frame file path [default: ]
-      --ifgt <INTRO_GT_DURATION>  intro frame greater than duration [default: ]
-      --iflt <INTRO_LT_DURATION>  intro frame less than duration [default: ]
-      --te <TRIM_END>             trim seconds from end of file [default: ]
-      --of <OUTRO_FRAME>          outro frame file path [default: ]
-      --ofgt <OUTRO_GT_DURATION>  outro frame greater than duration [default: ]
-      --oflt <OUTRO_LT_DURATION>  outro frame less than duration [default: ]
-      --se                        skip encoding
-      --tv                        take video from input source and map to the output (skip anything else, e.g. subtitles)
-      --ta                        take audio from input source and map to the output (skip anything else, e.g. subtitles)
-  -x, --ext <EXT>                 file(s) extension [default: mp4]
-  -f, --filter <FILTER>           process file that includes <f> in file path [default: ]
-  -l, --list                      list all file paths in current directory
-      --testi                     run test mode for images output only
-      --testv                     run test mode for videos output only
-      --scr <MAKE_SCREENSHOT>     make screenshot at time [default: ]
-  -h, --help                      Print help
-  -V, --version                   Print version
+  -d, --dir <DIR>
+          input directory path [default: /mnt/mystorage/rs_projects/ffmpegtrim]
+      --ts <TRIM_START>
+          trim seconds from start of file [default: ]
+      --if <INTRO_FRAME>
+          intro frame file path [default: ]
+      --ifgt <INTRO_GT_DURATION>
+          intro frame greater than duration [default: ]
+      --iflt <INTRO_LT_DURATION>
+          intro frame less than duration [default: ]
+      --ifba <INTRO_BLACKFRAME_AMOUNT>
+          intro frame blackframe amount [default: 95]
+      --ifbt <INTRO_BLACKFRAME_THRESHOLD>
+          intro frame blackframe threshold [default: 15]
+      --te <TRIM_END>
+          trim seconds from end of file [default: ]
+      --of <OUTRO_FRAME>
+          outro frame file path [default: ]
+      --ofgt <OUTRO_GT_DURATION>
+          outro frame greater than duration [default: ]
+      --oflt <OUTRO_LT_DURATION>
+          outro frame less than duration [default: ]
+      --ofba <OUTRO_BLACKFRAME_AMOUNT>
+          outro frame blackframe amount [default: 95]
+      --ofbt <OUTRO_BLACKFRAME_THRESHOLD>
+          outro frame blackframe threshold [default: 15]
+      --se
+          skip encoding
+      --tv
+          take video from input source and map to the output (skip anything else, e.g. subtitles)
+      --ta
+          take audio from input source and map to the output (skip anything else, e.g. subtitles)
+  -x, --ext <EXT>
+          file(s) extension [default: mp4]
+  -f, --filter <FILTER>
+          process file that includes <f> in file path [default: ]
+  -l, --list
+          list all file paths in current directory
+      --testi
+          run test mode for images output only
+      --testv
+          run test mode for videos output only
+      --scr <MAKE_SCREENSHOT>
+          make screenshot at time [default: ]
+  -h, --help
+          Print help
+  -V, --version
+          Print version
 ```
 
 ## Examples
