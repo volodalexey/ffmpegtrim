@@ -45,10 +45,10 @@ Options:
           outro frame blackframe threshold [default: 15]
       --se
           skip encoding
-      --tv
-          take video from input source and map to the output (skip anything else, e.g. subtitles)
-      --ta
-          take audio from input source and map to the output (skip anything else, e.g. subtitles)
+      --mv <MAP_VIDEO>
+          take video stream by index from input source and map to the output (skip anything else, e.g. subtitles) [default: ]
+      --ma <MAP_AUDIO>
+          take audio stream by index from input source and map to the output (skip anything else, e.g. subtitles) [default: ]
   -x, --ext <EXT>
           file(s) extension [default: mp4]
   -f, --filter <FILTER>
@@ -90,7 +90,7 @@ Trim 48 seconds from start & keep only 5 seconds after start position & filter f
 ```
 Trim 32 seconds from end & keep only 5 seconds before end position & take first video stream & take first audio stream
 ```shell
-./ffmpegtrim --te 32dur5 --ta --tv
+./ffmpegtrim --te 32dur5 --ma 0 --mv 0
 ```
 Trim 33 seconds from start & keep only 5 seconds after start position & filter files with mkv extension and path contains 01
 ```shell
@@ -111,4 +111,5 @@ cargo run -- -d /mnt/mystorage/Video/t --filter 51 --ts 21.32 --te 17.7
 cargo run -- -d /mnt/mystorage/Video/t --filter 51 --if /mnt/mystorage/Video/t/intro.jpg --ifgt 15 --iflt 30 --of /mnt/mystorage/Video/t/outro.jpg --ofgt 280 --oflt 300
 cargo run -- -d /mnt/mystorage/Video/t --ifgt 50 --iflt 60 --ofgt 550 --oflt 600
 cargo run -- -d /mnt/mystorage/Video/t --if /mnt/mystorage/Video/t/intro.jpg --ifgt 50 --iflt 60 --of /mnt/mystorage/Video/t/outro.jpg --ofgt 550 --oflt 600
+cargo run -- -d /mnt/mystorage/Video/t --if /mnt/mystorage/Video/t/intro.jpg --ifgt 55 --iflt 65 --ifba 99 --ifbt 05 --of /mnt/mystorage/Video/t/outro.jpg --ofgt 1275 --oflt 1300 --ofba 99 --ofbt 05 --filter 01 --ext mkv --ma 3 --mv 0
 ```

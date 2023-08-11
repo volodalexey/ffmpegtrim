@@ -104,16 +104,18 @@ struct Args {
     skip_encoding: bool,
 
     #[clap(
-        long = "tv",
-        help = "take video from input source and map to the output (skip anything else, e.g. subtitles)"
+        long = "mv",
+        help = "take video stream by index from input source and map to the output (skip anything else, e.g. subtitles)",
+        default_value = ""
     )]
-    take_video: bool,
+    map_video: String,
 
     #[clap(
-        long = "ta",
-        help = "take audio from input source and map to the output (skip anything else, e.g. subtitles)"
+        long = "ma",
+        help = "take audio stream by index from input source and map to the output (skip anything else, e.g. subtitles)",
+        default_value = ""
     )]
-    take_audio: bool,
+    map_audio: String,
 
     #[clap(
         short = 'x',
@@ -289,8 +291,8 @@ fn main() {
                 false => &args.trim_end,
             },
             args.skip_encoding,
-            args.take_video,
-            args.take_audio,
+            &args.map_video,
+            &args.map_audio,
         )
     }
     println!("DONE");

@@ -23,8 +23,8 @@ pub fn trim_start_end_command(
     trim_start: &str,
     trim_end: &str,
     skip_encoding: bool,
-    take_video: bool,
-    take_audio: bool,
+    map_video: &str,
+    map_audio: &str,
 ) -> CommandResult {
     if trim_start.contains("dur") && trim_end.contains("dur") {
         panic!("Both trim-start and trim-end options use duration value, only one allowed");
@@ -84,11 +84,17 @@ pub fn trim_start_end_command(
         command.args(["-to", &new_duration.to_string()]);
     }
     command.args(["-i", input_filepath, "-progress", "pipe:2"]);
-    if take_video {
-        command.args(["-map", "0:v:0"]);
+    if !map_video.is_empty() {
+        let video_index: u32 = map_video
+            .parse()
+            .expect("Unable to parse video stream index");
+        command.args(["-map", format!("0:v:{}", video_index).as_str()]);
     }
-    if take_audio {
-        command.args(["-map", "0:a:0"]);
+    if !map_audio.is_empty() {
+        let audio_index: u32 = map_audio
+            .parse()
+            .expect("Unable to parse audio stream index");
+        command.args(["-map", format!("0:a:{}", audio_index).as_str()]);
     }
     if skip_encoding {
         command.args(["-c", "copy"]);
@@ -127,7 +133,7 @@ mod tests {
 
     #[test]
     fn calc_command_result_basic() {
-        let command_result = trim_start_end_command("/f.f", 10.0, "", "", false, false, false);
+        let command_result = trim_start_end_command("/f.f", 10.0, "", "", false, "", "");
 
         assert_eq!(command_result.input_filename, "f.f");
         assert_eq!(command_result.output_filename, "f_tr.f");
@@ -141,7 +147,7 @@ mod tests {
 
     #[test]
     fn calc_command_result_trim_start() {
-        let command_result = trim_start_end_command("/a.mp4", 10.0, "4.5", "", true, false, false);
+        let command_result = trim_start_end_command("/a.mp4", 10.0, "4.5", "", true, "", "");
 
         assert_eq!(command_result.input_filename, "a.mp4");
         assert_eq!(command_result.output_filename, "a_tr.mp4");
@@ -155,7 +161,7 @@ mod tests {
 
     #[test]
     fn calc_command_result_trim_end() {
-        let command_result = trim_start_end_command("/b.mp4", 10.0, "", "5.46", false, true, true);
+        let command_result = trim_start_end_command("/b.mp4", 10.0, "", "5.46", false, "0", "1");
 
         assert_eq!(command_result.input_filename, "b.mp4");
         assert_eq!(command_result.output_filename, "b_tr.mp4");
@@ -163,14 +169,14 @@ mod tests {
         assert_eq!(command_result.seconds_from_start, 0.0);
         assert_eq!(
             command_result.command_str,
-            "-to 4.54 -i /b.mp4 -progress pipe:2 -map 0:v:0 -map 0:a:0 -vf yadif /b_tr.mp4"
+            "-to 4.54 -i /b.mp4 -progress pipe:2 -map 0:v:0 -map 0:a:1 -vf yadif /b_tr.mp4"
         );
     }
 
     #[test]
     fn calc_command_result_trim_both() {
         let command_result =
-            trim_start_end_command("/some/c.mp4", 10.0, "1.52", "3.33", true, false, true);
+            trim_start_end_command("/some/c.mp4", 10.0, "1.52", "3.33", true, "", "0");
 
         assert_eq!(command_result.input_filename, "c.mp4");
         assert_eq!(command_result.output_filename, "c_tr.mp4");
@@ -187,13 +193,13 @@ mod tests {
         expected = "Both trim-start and trim-end options use duration value, only one allowed"
     )]
     fn calc_command_result_panic_both_dur() {
-        trim_start_end_command("/some/c.mp4", 0.0, "1dur1", "1dur1", false, false, false);
+        trim_start_end_command("/some/c.mp4", 0.0, "1dur1", "1dur1", false, "", "");
     }
 
     #[test]
     fn calc_command_result_trim_start_dur() {
         let command_result =
-            trim_start_end_command("/s/d.mp4", 10.0, "1.52dur4.5", "", false, false, true);
+            trim_start_end_command("/s/d.mp4", 10.0, "1.52dur4.5", "", false, "", "0");
 
         assert_eq!(command_result.input_filename, "d.mp4");
         assert_eq!(command_result.output_filename, "d_tr.mp4");
@@ -212,8 +218,8 @@ pub fn trim_start_end(
     trim_start: &str,
     trim_end: &str,
     skip_encoding: bool,
-    take_video: bool,
-    take_audio: bool,
+    map_video: &str,
+    map_audio: &str,
 ) {
     let mut soft_exit = false;
     let mut command_result = trim_start_end_command(
@@ -222,8 +228,8 @@ pub fn trim_start_end(
         trim_start,
         trim_end,
         skip_encoding,
-        take_video,
-        take_audio,
+        map_video,
+        map_audio,
     );
 
     println!(
